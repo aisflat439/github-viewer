@@ -4,18 +4,6 @@ export const Main = () => {
   return (
     <>
       <h1 className="text-center text-3xl mb-8">Github Repo Viewer</h1>
-      <div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <label>
-            <input type="text" placeholder="Search for a github user" />
-          </label>
-          <button type="submit">Submit</button>
-        </form>
-      </div>
       <div className="grid grid-cols-12 gap-6 text-white">
         <GridItem
           title="Bundling"
