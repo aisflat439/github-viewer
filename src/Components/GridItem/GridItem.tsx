@@ -14,7 +14,7 @@ export const GridItem = ({
   return (
     <div
       data-testid="grid-item"
-      className={`col-span-6 rounded-lg p-8 bg-gradient-to-br ${className}`}
+      className={`col-span-12 md:col-span-6 rounded-lg p-8 bg-gradient-to-br ${className}`}
     >
       <h2 className="mb-4 font-light">{title}</h2>
       <h3 className="text-3xl font-semibold mb-4">{subtitle}</h3>
