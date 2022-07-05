@@ -1,6 +1,10 @@
 import React from "react";
 import { useActor, useInterpret, useSelector } from "@xstate/react";
-import { searchMachine, selectResults } from "../machines/searchMachine";
+import {
+  searchMachine,
+  selectErrors,
+  selectResults,
+} from "../machines/searchMachine";
 import { InterpreterFrom } from "xstate";
 
 const initialState = {
@@ -30,11 +34,13 @@ export const GlobalServicesProvider = ({ children }: Props) => {
 export const useSearch = () => {
   const searchService = useInterpret(searchMachine);
   const [state, send] = useActor(searchService);
+  const isIdle = state.matches("idle");
   const results = useSelector(searchService, selectResults);
+  const errors = useSelector(searchService, selectErrors);
 
   const handleSubmitSearch = (username: string | undefined) => {
     send({ type: "search", username: username });
   };
 
-  return { send, state, results, handleSubmitSearch };
+  return { send, state, errors, results, handleSubmitSearch, isIdle };
 };

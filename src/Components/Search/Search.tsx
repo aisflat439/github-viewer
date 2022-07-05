@@ -1,10 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSearch } from "../../context/globalServices";
 
 export const Search = () => {
+  const navigate = useNavigate();
   const ref = React.useRef<HTMLInputElement>(null);
-  const { handleSubmitSearch } = useSearch();
+  const { handleSubmitSearch, errors, state } = useSearch();
 
   return (
     <div className="bg-gray-200 border-b-4 border-zinc-300">
@@ -13,20 +14,26 @@ export const Search = () => {
           Home
         </Link>
         <form
-          className="p-4"
+          className="p-4 flex items-center"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmitSearch(ref.current?.value);
+            navigate(`/${ref.current?.value}`, { replace: true });
           }}
         >
-          <label className="text-sm font-medium mr-4">
-            Search:
-            <input
-              ref={ref}
-              type="text"
-              placeholder="aisflat439"
-              className="bg-transparent ml-4 placeholder:font-light"
-            />
+          <label className="text-sm font-medium mr-4 relative">
+            <div className="flex">
+              Search:
+              <input
+                ref={ref}
+                type="text"
+                placeholder="aisflat439"
+                className="bg-transparent ml-4 placeholder:font-light"
+              />
+            </div>
+            {errors.searchInput && (
+              <p className="text-red-600 absolute">{errors.searchInput}</p>
+            )}
           </label>
           <button
             type="submit"
