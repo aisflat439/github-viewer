@@ -21,11 +21,22 @@ type Events =
   | { type: "refresh" }
   | { type: "load-more" };
 
-interface FetchResult {
-  login: string;
+interface Repo {
+  id: string;
+  name: string;
 }
 
-const fetchUser = (username: string): Promise<FetchResult> => {
+interface FetchResult {
+  login: string;
+  html_url: string;
+  bio: string;
+  stars: number;
+  following: number;
+  followers: number;
+  repos: Repo[];
+}
+
+const fetchUser = (username: string): PromiseLike<FetchResult> => {
   return fetch(`https://api.github.com/users/${username}`, {
     method: "GET",
     headers: {
@@ -34,7 +45,7 @@ const fetchUser = (username: string): Promise<FetchResult> => {
   }).then((res) => res.json());
 };
 
-const fetchRepos = (username: string): Promise<FetchResult> => {
+const fetchRepos = (username: string): PromiseLike<Repo[]> => {
   return fetch(`https://api.github.com/users/${username}/repos`, {
     method: "GET",
     headers: {
