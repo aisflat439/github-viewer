@@ -14,7 +14,7 @@ export const User = () => {
   return (
     <>
       <h1 className="text-center text-3xl mb-8">View user page</h1>
-      <div className="flex">
+      <div className="">
         {isIdle && targetUser && (
           <>
             <a href={targetUser.html_url} target="_blank">
@@ -25,7 +25,7 @@ export const User = () => {
             <p>{targetUser.following}</p>
             <p>{targetUser.followers}</p>
             {targetUser.repos.map((repo) => {
-              return <a>{repo.name}</a>;
+              return <a key={repo.id}>{repo.name}</a>;
             })}
           </>
         )}
