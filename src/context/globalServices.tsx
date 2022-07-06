@@ -42,5 +42,17 @@ export const useSearch = () => {
     send({ type: "search", username: username });
   };
 
-  return { send, state, errors, results, handleSubmitSearch, isIdle };
+  const handleFetchMore = (username: string) => {
+    send({ type: "load-more", username: username });
+  };
+
+  return {
+    send,
+    state,
+    errors,
+    results,
+    handleSubmitSearch,
+    handleFetchMore,
+    isIdle,
+  };
 };

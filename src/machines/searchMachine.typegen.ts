@@ -5,9 +5,15 @@ export interface Typegen0 {
   eventsCausingActions: {
     clearErrors: "search";
     createSearchError: "search";
+    updateUsersRepos: "done.invoke.search-machine.paginating:invocation[0]";
     assignUserToContext: "done.invoke.search-machine.searching:invocation[0]";
   };
   internalEvents: {
+    "done.invoke.search-machine.paginating:invocation[0]": {
+      type: "done.invoke.search-machine.paginating:invocation[0]";
+      data: unknown;
+      __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
     "done.invoke.search-machine.searching:invocation[0]": {
       type: "done.invoke.search-machine.searching:invocation[0]";
       data: unknown;
@@ -16,6 +22,7 @@ export interface Typegen0 {
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
+    loadMoreRepos: "done.invoke.search-machine.paginating:invocation[0]";
     retrieveAccount: "done.invoke.search-machine.searching:invocation[0]";
   };
   missingImplementations: {
@@ -26,6 +33,7 @@ export interface Typegen0 {
   };
   eventsCausingServices: {
     retrieveAccount: "search";
+    loadMoreRepos: "load-more";
   };
   eventsCausingGuards: {
     isSearchValid: "search";

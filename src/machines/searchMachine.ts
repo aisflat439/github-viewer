@@ -11,6 +11,9 @@ type Services = {
   retrieveAccount: {
     data: FetchResult;
   };
+  loadMoreRepos: {
+    data: Repo[];
+  };
 };
 
 type Events =
@@ -19,21 +22,29 @@ type Events =
       username: string | undefined;
     }
   | { type: "refresh" }
-  | { type: "load-more" };
+  | { type: "load-more"; username: string };
 
 interface Repo {
+  description: string;
+  html_url: string;
   id: string;
+  language: string;
   name: string;
+  stargazers_count: number;
+  owner: {
+    login: string;
+  };
 }
 
 interface FetchResult {
-  login: string;
-  html_url: string;
   bio: string;
-  stars: number;
-  following: number;
   followers: number;
+  following: number;
+  html_url: string;
+  login: string;
   repos: Repo[];
+  stars: number;
+  public_repos: number;
 }
 
 const fetchUser = (username: string): PromiseLike<FetchResult> => {
@@ -52,6 +63,24 @@ const fetchRepos = (username: string): PromiseLike<Repo[]> => {
       Authorization: import.meta.env.VITE_GITHUB_ACCESS_KEY,
     },
   }).then((res) => res.json());
+};
+
+const fetchMoreRepos = (
+  username: string,
+  current: number,
+  max: number
+): PromiseLike<Repo[]> => {
+  const page = Number(current / 30);
+  const nextPage = current <= max ? Math.trunc(page) + 1 : Math.trunc(page);
+  return fetch(
+    `https://api.github.com/users/${username}/repos?page=${nextPage}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: import.meta.env.VITE_GITHUB_ACCESS_KEY,
+      },
+    }
+  ).then((res) => res.json());
 };
 
 export const searchMachine =
@@ -92,7 +121,18 @@ export const searchMachine =
             },
           },
         },
-        paginating: {},
+        paginating: {
+          invoke: {
+            src: "loadMoreRepos",
+            onDone: {
+              target: "idle",
+              actions: ["updateUsersRepos"],
+            },
+            onError: {
+              target: "errored",
+            },
+          },
+        },
         searching: {
           invoke: {
             src: "retrieveAccount",
@@ -128,6 +168,23 @@ export const searchMachine =
             return { searchInput: "" };
           },
         }),
+        updateUsersRepos: assign({
+          results: (context, event) => {
+            const user = context.results.find(
+              (u) => u.login === event.data[0].owner.login
+            );
+
+            return context.results.map((cachedUser) => {
+              if (user?.login === cachedUser.login) {
+                return {
+                  ...cachedUser,
+                  repos: [...cachedUser.repos, ...event.data],
+                };
+              }
+              return cachedUser;
+            });
+          },
+        }),
         assignUserToContext: assign({
           results: (context, event) => {
             const shouldReplace = context.results.some(
@@ -161,7 +218,16 @@ export const searchMachine =
             fetchRepos(event.username || ""),
           ]);
 
+          console.log("res[1]: ", res[1]);
           return { ...res[0], repos: res[1] };
+        },
+        loadMoreRepos: async (context, event) => {
+          const user = context.results.find((u) => u.login === event.username);
+          const current = user?.repos.length || 0;
+          const max = user?.public_repos || 0;
+          const res = await fetchMoreRepos(event.username, current, max);
+
+          return res;
         },
       },
     }
